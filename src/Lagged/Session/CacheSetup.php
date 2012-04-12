@@ -59,7 +59,7 @@ class CacheSetup extends BaseAbstract
         $from  = 0;
         $limit = 100;
 
-        while ($from <= $total) {
+        while ($from <= ($total + 100)) {
 
             $sql = sprintf(
                 "SELECT session_id, session_date, rec_datemod FROM `%s` LIMIT %d, %d",
@@ -76,9 +76,22 @@ class CacheSetup extends BaseAbstract
                 break;
             }
             while ($row = $result->fetch_object()) {
-                $status = $this->memcache->set($row->session_id, $row->session_data);
+                $status = $this->memcache->replace(
+                    $row->session_id,
+                    $row->session_data,
+                    $this->compression,
+                    $this->expire
+                );
                 if (false === $status) {
-                    throw new \RuntimeException("Could not save to memcache.");
+                    $status = $this->memcache->set(
+                        $row->session_id,
+                        $row->session_data,
+                        $this->compression,
+                        $this->expire
+                    );
+                    if (false === $status) {
+                        throw new \RuntimeException("Could not save to memcache.");
+                    }
                 }
             }
             $from += $limit;
