@@ -81,18 +81,16 @@ class MemcacheTestCase extends \PHPUnit_Framework_TestCase
 
         $db->query(sprintf("USE %s", $config['dbname']));
 
-        $sql  = "CREATE TABLE IF NOT EXISTS `session2` (";
-        $sql .= "`session_id` varchar(32) NOT NULL DEFAULT '',";
-        $sql .= "`session_data` text NOT NULL,";
-        $sql .= "`user_id` int(10) DEFAULT NULL,";
-        $sql .= "`rec_dateadd` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',";
-        $sql .= "`rec_datemod` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',";
-        $sql .= "PRIMARY KEY (`session_id`),";
-        $sql .= "KEY `gc` (`rec_datemod`),";
-        $sql .= "KEY `user_idx` (`user_id`)";
-        $sql .= ") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+        $table = realpath(dirname(dirname(dirname(dirname(dirname(__DIR__))))) . '/var/session.sql');
+        $sql   = file_get_contents($table);
+        if (false === $sql) {
+            throw new \RuntimeException(sprintf("Could not open file '%s'", $table));
+        }
 
-        $db->query($sql);
+        $res = $db->query($sql);
+        if (false === $res) {
+            throw new \RuntimeException(sprintf("Could not create table from '%s': %s", $table, $db->error));
+        }
         $db->close();
     }
 
