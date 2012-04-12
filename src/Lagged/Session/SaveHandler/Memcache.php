@@ -45,27 +45,30 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
     public function read($id)
     {
         $session = $this->memcache->get($id, $this->compression);
-        if (false === $session) {
-            $sql = sprintf(
-                "SELECT session_data FROM %s WHERE session_id = '%s'",
-                $this->table,
-                $this->db->real_escape_string($id)
-            );
-            $res = $this->query($sql);
-            if (false === $res) {
-                // db error
-                return '';
-            }
-            if ($res->num_rows == 0) {
-                return '';
-            }
-            while ($row = $res->fetch_object()) {
-                $session_data = $row->session_data;
-                break;
-            }
-            $res->close();
-            $this->memcache->set($id, $session_data, $this->compression, $this->expire);
+        if (false !== $session) {
+            return $session;
         }
+        $sql = sprintf(
+            "SELECT session_data FROM `%s` WHERE session_id = '%s'",
+            $this->table,
+            $this->db->real_escape_string($id)
+        );
+        $res = $this->query($sql);
+        if (false === $res) {
+            // db error
+            return '';
+        }
+        if ($res->num_rows == 0) {
+            return '';
+        }
+        while ($row = $res->fetch_object()) {
+            $session_data = $row->session_data;
+            break;
+        }
+        $res->close();
+        $this->memcache->set($id, $session_data, $this->compression, $this->expire);
+
+        return $session_data;
     }
 
     /**
@@ -73,6 +76,8 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
      *
      * @param string $id
      * @param string $data
+     *
+     * @return void
      */
     public function write ($id, $data)
     {
@@ -85,7 +90,7 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
 
         $user_id = $this->getUserId($data);
 
-        $sql  = sprintf("INSERT INTO %s (", $this->table);
+        $sql  = sprintf("INSERT INTO `%s` (", $this->table);
         $sql .= " session_id, session_data, user_id, rec_dateadd, rec_datemod";
         $sql .= " )";
         $sql .= " VALUES(";
@@ -103,24 +108,26 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
         $this->query($sql);
     }
 
-    public function open ($save_path, $name)
+    /**
+     * Not used.
+     *
+     * @param string $save_path
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function open($save_path, $name)
     {
         return true;
     }
 
     /**
-     * Close all connections!
+     * Not used.
      *
      * @return bool
      */
-    public function close ()
+    public function close()
     {
-        return true;
-        $this->memcache->close();
-
-        if ($this->db instanceof \mysqli) {
-            $this->db->close();
-        }
         return true;
     }
 
@@ -131,7 +138,7 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
      *
      * @return void
      */
-    public function destroy ($id)
+    public function destroy($id)
     {
         $this->memcache->delete($id);
 
@@ -144,13 +151,13 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
     }
 
     /**
-     * Not being used. We do it asynchronously!
+     * Not used. We do it asynchronously!
      *
      * @param $maxlifetime
      *
      * @return bool
      */
-    public function gc ($maxlifetime)
+    public function gc($maxlifetime)
     {
         return true;
     }
