@@ -70,6 +70,12 @@ class MemcacheTestCase extends \PHPUnit_Framework_TestCase
         $this->assertEquals($session_memcache, $session_sql);
     }
 
+    /**
+     * Creates the database and the table.
+     *
+     * @return void
+     * @throws \RuntimeException
+     */
     public function setUp()
     {
         $config = $this->getDbConfiguration();
@@ -94,6 +100,11 @@ class MemcacheTestCase extends \PHPUnit_Framework_TestCase
         $db->close();
     }
 
+    /**
+     * Deletes the test database.
+     *
+     * @return void
+     */
     public function tearDown()
     {
         $config = $this->getDbConfiguration();
@@ -103,6 +114,12 @@ class MemcacheTestCase extends \PHPUnit_Framework_TestCase
         $db->close();
 
     }
+
+    /**
+     * Configuration for testing!
+     * 
+     * @return array
+     */
     protected function getDbConfiguration()
     {
         return array(
