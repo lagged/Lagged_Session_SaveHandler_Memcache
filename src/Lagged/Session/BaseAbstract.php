@@ -72,6 +72,7 @@ abstract class BaseAbstract
         if (!is_bool($debug)) {
             throw new \InvalidArgumentException("'debug' must be boolean.");
         }
+        $this->debug = $debug;
     }
 
     /**
