@@ -48,14 +48,20 @@ class Autoload
     /**
      * Register the autoloader.
      *
+     * @param boolean $prepend Prepend the autoloader to the stack.
+     *
      * @return boolean
+     * @throws \InvalidArgumentException
      */
-    public static function register()
+    public static function register($prepend = false)
     {
+        if (!is_bool($prepend)) {
+            throw new \InvalidArgumentException("Parameter must be boolean.");
+        }
         if (null === self::$registered) {
             $loader = new self;
             self::$registered = true;
-            return spl_autoload_register(array($loader, 'autoload'));
+            return spl_autoload_register(array($loader, 'autoload'), false, $prepend);
         }
         return false;
     }
