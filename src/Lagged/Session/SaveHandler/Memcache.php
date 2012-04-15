@@ -46,6 +46,7 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
     {
         $session = $this->memcache->get($id, $this->compression);
         if (false !== $session) {
+            $this->debug(sprintf("Found session '%s' in memcache.", $id));
             return $session;
         }
         $sql = sprintf(
@@ -56,17 +57,22 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
         $res = $this->query($sql);
         if (false === $res) {
             // db error
+            $this->debug(sprintf("MySQL error: '%s', session: '%s'", $this->db->error, $id));
             return '';
         }
         if ($res->num_rows == 0) {
+            $this->debug(sprintf("No session '%s' in MySQL.", $id));
             return '';
         }
         while ($row = $res->fetch_object()) {
             $session_data = $row->session_data;
             break;
         }
+        $this->debug(sprintf("Found session '%s' in MySQL", $id));
+
         $res->close();
         $this->memcache->set($id, $session_data, $this->compression, $this->expire);
+        $this->debug(sprintf("Saved session '%s' to memcache.", $id));
 
         return $session_data;
     }
@@ -83,6 +89,7 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
     {
         if (false === ($this->memcache->replace($id, $data, $this->compression, $this->expire))) {
             $this->memcache->set($id, $data, $this->compression, $this->expire);
+            $this->debug(sprintf("Replaced session '%s' in Memcache", $id));
         }
 
         $session_id   = $this->db->real_escape_string($id);
@@ -105,7 +112,10 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
         $sql .= sprintf(" user_id = %s,", $user_id);
         $sql .= " rec_datemod = NOW()";
 
-        $this->query($sql);
+        $status = $this->query($sql);
+        if (false === $status) {
+            $this->debug(sprintf("Failed writing session '%s' to MySQL: %s", $id, $this->db->error));
+        }
     }
 
     /**
@@ -141,13 +151,19 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
     public function destroy($id)
     {
         $this->memcache->delete($id);
+        $this->debug(sprintf("Deleted session '%s' from Memcache.", $id));
 
         $sql = sprintf(
             "DELETE FROM %s WHERE session_id = %s",
             $this->table,
             $this->db->real_escape_string($id)
         );
-        $this->query($sql);
+        $status = $this->query($sql);
+        if (false === $status) {
+            $this->debug(sprintf("Failed deleting session '%s' from MySQL.", $id));
+            return;
+        }
+        $this->debug(sprintf("Deleted session '%s' from MySQL", $id));
     }
 
     /**
@@ -214,4 +230,3 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
         return $userId;
     }
 }
-
