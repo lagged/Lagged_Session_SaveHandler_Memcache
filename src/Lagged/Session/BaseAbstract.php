@@ -33,6 +33,12 @@ abstract class BaseAbstract
     protected $db;
 
     /**
+     * Debug, yes or no?
+     * @var boolean
+     */
+    protected $debug;
+
+    /**
      * The expiration time: 7 days.
      * @var int
      */
@@ -54,13 +60,18 @@ abstract class BaseAbstract
      *
      * @param \memcache                 $memcache
      * @param \Zend_Db_Adapter_Abstract $db
+     * @param boolean                   $debug
      *
      * @return $this
+     * @throws \InvalidArgumentException
      */
-    public function __construct(\memcache $memcache, \Zend_Db_Adapter_Abstract $db)
+    public function __construct(\memcache $memcache, \Zend_Db_Adapter_Abstract $db, $debug = false)
     {
         $this->memcache = $memcache;
         $this->db       = $db->getConnection();
+        if (!is_bool($debug)) {
+            throw new \InvalidArgumentException("'debug' must be boolean.");
+        }
     }
 
     /**
@@ -100,6 +111,20 @@ abstract class BaseAbstract
                 throw new \RuntimeException(sprintf("You cannot set '%s'.", $var));
         }
         return $this;
+    }
+
+    /**
+     * Only log when {@link self::$debug} is 'true'.
+     *
+     * @param string $message
+     *
+     * @return void
+     */
+    protected function debug($message)
+    {
+        if (true === $this->debug) {
+            $this->log($message);
+        }
     }
 
     /**
