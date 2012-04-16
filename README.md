@@ -86,4 +86,4 @@ This is likely to be in one of your bootstrap files:
 
     $memcacheSaveHandler = new SessionHandler($memcache, $db);
     Zend_Session::setSaveHandler($memcacheSaveHandler);
-
+    register_shutdown_function('session_write_close');
