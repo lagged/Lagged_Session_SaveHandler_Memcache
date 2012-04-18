@@ -17,6 +17,7 @@
 namespace Lagged\Session\SaveHandler;
 
 use Lagged\Session\BaseAbstract;
+use Lagged\Session\Helper;
 
 /**
  * @category   Session
@@ -179,37 +180,6 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
     }
 
     /**
-     * Decode the raw session data from PHP to extract the user's ID.
-     *
-     * Inspiration from http://php.net/session_decode
-     *
-     * @param string $data
-     *
-     * @return array
-     */
-    public static function decode($data)
-    {
-        $vars = preg_split(
-            '/([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff^|]*)\|/',
-            $data,
-            -1,
-            PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE
-        );
-
-        $result = array();
-        for ($i=0; $i<=(count($vars)/2); $i=$i+2) {
-            if (!isset($vars[$i])) {
-                continue;
-            }
-            $key = $vars[$i];
-            $val = $vars[$i+1];
-
-            $result[$key] = unserialize($val);
-        }
-        return $result;
-    }
-
-    /**
      * This extracts the user's ID from our session.
      *
      * You can obviously overwrite this by extending in case you need something else!
@@ -220,7 +190,7 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
      */
     protected function getUserId($data)
     {
-        $session = $this->decode($data);
+        $session = Helper::decode($data);
         $userId  = 'NULL';
         if (isset($session[$this->sessionName])) {
             if (isset($session[$this->sessionName]['storage'])) {
