@@ -178,25 +178,4 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
     {
         return true;
     }
-
-    /**
-     * This extracts the user's ID from our session.
-     *
-     * You can obviously overwrite this by extending in case you need something else!
-     *
-     * @param string $data
-     *
-     * @return mixed
-     */
-    protected function getUserId($data)
-    {
-        $session = Helper::decode($data);
-        $userId  = 'NULL';
-        if (isset($session[$this->sessionName])) {
-            if (isset($session[$this->sessionName]['storage'])) {
-                $userId = $this->db->real_escape_string($session[$this->sessionName]['storage']['id']);
-            }
-        }
-        return $userId;
-    }
 }
