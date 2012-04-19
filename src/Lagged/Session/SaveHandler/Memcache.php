@@ -77,20 +77,37 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
      * @param string $id
      * @param string $data
      *
-     * @return void
+     * @return bool
      */
     public function write ($id, $data)
     {
+        $this->debug(sprintf("write(): ID: %s Data: %s", $id, $data));
         if (false === ($this->memcache->replace($id, $data, $this->compression, $this->expire))) {
-            $this->memcache->set($id, $data, $this->compression, $this->expire);
-            $this->debug(sprintf("Replaced session '%s' in Memcache", $id));
+            $status = $this->memcache->set($id, $data, $this->compression, $this->expire);
+            if (false === $status) {
+                $msg = sprintf("Memcache::set() failed: '%s'", $id);
+                if (true === $this->testing) {
+                    throw new \RuntimeException($msg);
+                }
+                $this->debug($msg);
+            } else {
+                $this->debug(sprintf("Memcache::set() success: '%s'", $id));
+            }
+        } else {
+            $this->debug(sprintf("Memcache::replace() success: '%s'", $id));
         }
 
         $user   = $this->getUserId($data);
         $status = $this->db->save($id, $data, $user);
         if (false === $status) {
-            $this->debug(sprintf("Failed writing session '%s' to MySQL: %s", $id, $this->db->error));
+            $msg = sprintf("Failed writing session '%s' to MySQL: %s", $id, $this->db->getError());
+            if (true === $this->testing) {
+                throw new \RuntimeException($msg);
+            }
+            $this->debug($msg);
+            return false;
         }
+        return true;
     }
 
     /**
@@ -130,7 +147,11 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
 
         $status = $this->db->destroy($id);
         if (false === $status) {
-            $this->debug(sprintf("Failed deleting session '%s' from MySQL.", $id));
+            $msg = sprintf("Failed deleting session '%s' from MySQL.", $id);
+            if (true === $this->testing) {
+                throw new \RuntimeException($msg);
+            }
+            $this->debug($msg);
             return;
         }
         $this->debug(sprintf("Deleted session '%s' from MySQL", $id));
