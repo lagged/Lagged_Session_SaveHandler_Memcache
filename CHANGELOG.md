@@ -7,6 +7,7 @@
     * improved testsuite
     * refactored MySQL calls
     * improved README (with setup, testing, etc. instructions)
+    * added 'testing' mode which throws exceptions (off by default)
  * feature:
     * added a Mysql-based session handler (stand-alone)
 
