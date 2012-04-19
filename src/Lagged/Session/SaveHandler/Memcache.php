@@ -18,6 +18,7 @@ namespace Lagged\Session\SaveHandler;
 
 use Lagged\Session\BaseAbstract;
 use Lagged\Session\Helper;
+use Lagged\Session\MysqlWrapper;
 
 /**
  * @category   Session
@@ -50,28 +51,20 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
             $this->debug(sprintf("Found session '%s' in memcache.", $id));
             return $session;
         }
-        $sql = sprintf(
-            "SELECT session_data FROM `%s` WHERE session_id = '%s'",
-            $this->table,
-            $this->db->real_escape_string($id)
-        );
-        $res = $this->query($sql);
-        if (false === $res) {
+
+        $session_data = $this->db->find($id);
+        if (false === $session_data) {
             // db error
             $this->debug(sprintf("MySQL error: '%s', session: '%s'", $this->db->error, $id));
             return '';
         }
-        if ($res->num_rows == 0) {
+        if (empty($session_data)) {
             $this->debug(sprintf("No session '%s' in MySQL.", $id));
             return '';
         }
-        while ($row = $res->fetch_object()) {
-            $session_data = $row->session_data;
-            break;
-        }
+
         $this->debug(sprintf("Found session '%s' in MySQL", $id));
 
-        $res->close();
         $this->memcache->set($id, $session_data, $this->compression, $this->expire);
         $this->debug(sprintf("Saved session '%s' to memcache.", $id));
 
@@ -93,27 +86,8 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
             $this->debug(sprintf("Replaced session '%s' in Memcache", $id));
         }
 
-        $session_id   = $this->db->real_escape_string($id);
-        $session_data = $this->db->real_escape_string($data);
-
-        $user_id = $this->getUserId($data);
-
-        $sql  = sprintf("INSERT INTO `%s` (", $this->table);
-        $sql .= " session_id, session_data, user_id, rec_dateadd, rec_datemod";
-        $sql .= " )";
-        $sql .= " VALUES(";
-        $sql .= sprintf(" '%s', '%s', '%s', NOW(), NOW()",
-            $session_id,
-            $session_data,
-            $user_id
-        );
-        $sql .= " )";
-        $sql .= " ON DUPLICATE KEY UPDATE";
-        $sql .= sprintf(" session_data = '%s',", $session_data);
-        $sql .= sprintf(" user_id = %s,", $user_id);
-        $sql .= " rec_datemod = NOW()";
-
-        $status = $this->query($sql);
+        $user   = $this->getUserId($data);
+        $status = $this->db->save($id, $data, $user);
         if (false === $status) {
             $this->debug(sprintf("Failed writing session '%s' to MySQL: %s", $id, $this->db->error));
         }
@@ -154,12 +128,7 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
         $this->memcache->delete($id);
         $this->debug(sprintf("Deleted session '%s' from Memcache.", $id));
 
-        $sql = sprintf(
-            "DELETE FROM %s WHERE session_id = %s",
-            $this->table,
-            $this->db->real_escape_string($id)
-        );
-        $status = $this->query($sql);
+        $status = $this->db->destroy($id);
         if (false === $status) {
             $this->debug(sprintf("Failed deleting session '%s' from MySQL.", $id));
             return;
