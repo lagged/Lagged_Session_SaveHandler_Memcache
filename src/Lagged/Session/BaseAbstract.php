@@ -67,6 +67,12 @@ abstract class BaseAbstract
     protected $sessionName = 'ezSession';
 
     /**
+     * Allows us to be super-verbose in the testsuite!
+     * @var bool
+     */
+    protected $testing = false;
+
+    /**
      * Bootstrap this.
      *
      * @param \memcache                 $memcache
@@ -100,32 +106,38 @@ abstract class BaseAbstract
     public function __set($var, $value)
     {
         switch ($var) {
-            case 'compression':
-                if (!($this instanceof Memcache)) {
-                    throw new \LogicException("This value is only required with Memcache.");
-                }
-                if ($value !== 0 && $value !== \MEMCACHE_COMPRESSED) {
-                    throw new \InvalidArgumentException("Illegal compression value.");
-                }
-                $this->compression = $value;
-                break;
-            case 'expire':
-                if (!is_int($value)) {
-                    throw new \InvalidArgumentException("The expiration value has to be an integer.");
-                }
-                if ($value > 2592000) {
-                    throw new \InvalidArgumentException("The expiration value cannot exceed 30 days.");
-                }
-                $this->expire = $value;
-                break;
-            case 'table':
-                $this->db->setTable($value);
-                break;
-            case 'sessionName':
-                $this->sessionName = $value;
-                break;
-            default:
-                throw new \RuntimeException(sprintf("You cannot set '%s'.", $var));
+        case 'compression':
+            if (!($this instanceof Memcache)) {
+                throw new \LogicException("This value is only required with Memcache.");
+            }
+            if ($value !== 0 && $value !== \MEMCACHE_COMPRESSED) {
+                throw new \InvalidArgumentException("Illegal compression value.");
+            }
+            $this->compression = $value;
+            break;
+        case 'expire':
+            if (!is_int($value)) {
+                throw new \InvalidArgumentException("The expiration value has to be an integer.");
+            }
+            if ($value > 2592000) {
+                throw new \InvalidArgumentException("The expiration value cannot exceed 30 days.");
+            }
+            $this->expire = $value;
+            break;
+        case 'table':
+            $this->db->setTable($value);
+            break;
+        case 'testing':
+            if (!is_bool($value)) {
+                throw new \InvalidArgumentException("Testing can be either 'true' or 'false'");
+            }
+            $this->testing = $value;
+            break;
+        case 'sessionName':
+            $this->sessionName = $value;
+            break;
+        default:
+            throw new \RuntimeException(sprintf("You cannot set '%s'.", $var));
         }
         return $this;
     }
