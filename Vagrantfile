@@ -10,12 +10,8 @@ Vagrant::Config.run do |config|
   config.vm.customize [
     "modifyvm", :id,
     "--name", "Session VM",
-    "--memory", "1024"
+    "--memory", "512"
   ]
-
-  # nginx
-  config.vm.forward_port 80, 8080
-  config.vm.forward_port 8983, 8985
 
   config.vm.share_folder "v-data", "/vagrant_data", "./"
 
@@ -26,7 +22,6 @@ Vagrant::Config.run do |config|
 
     chef.add_recipe "php-fpm::install-apt"
     chef.add_recipe "php-fpm::pear"
-    chef.add_recipe "php-phar"
     chef.add_recipe "phpunit"
     chef.add_recipe "memcache"
     chef.add_recipe "percona::server"
