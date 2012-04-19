@@ -5,7 +5,7 @@ use Lagged\Session\SaveHandler\Memcache as MemcacheSession;
 use Lagged\Session\Helper;
 
 /**
- * This is an integration test.
+ * This is an integration test suite.
  *
  * @category Testing
  * @package  Lagged\Session\SaveHandler\Memcache
