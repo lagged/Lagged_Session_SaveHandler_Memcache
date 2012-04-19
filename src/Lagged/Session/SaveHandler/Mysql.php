@@ -33,12 +33,14 @@ class Mysql extends BaseAbstract implements \Zend_Session_SaveHandler_Interface
 {
     /**
      * @param \Zend_Db_Adapter_Mysqli $db
+     * @param bool                    $debug
      *
-     * @return $this
+     * @return \Lagged\Session\SaveHandler\Mysql
      */
-    public function __construct(\Zend_Db_Adapter_Mysqli $db)
+    public function __construct(\Zend_Db_Adapter_Mysqli $db, $debug = false)
     {
-        $this->db = new MysqlWrapper($db->getConnection());
+        $this->db    = new MysqlWrapper($db->getConnection());
+        $this->debug = $debug;
     }
 
     /**
