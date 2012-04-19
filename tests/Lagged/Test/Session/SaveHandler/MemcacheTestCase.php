@@ -149,7 +149,7 @@ class MemcacheTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Deletes the test database.
+     * Deletes the test database. Empties Memcached.
      *
      * @return void
      */
@@ -160,7 +160,7 @@ class MemcacheTestCase extends \PHPUnit_Framework_TestCase
         $db = new \mysqli($config['host'], $config['username'], $config['password']);
         $db->query(sprintf("DROP DATABASE %s", $config['dbname']));
         $db->close();
-
+        $this->setUpMemcache()->flush();
     }
 
     /**
