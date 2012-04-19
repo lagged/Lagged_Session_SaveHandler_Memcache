@@ -61,9 +61,10 @@ abstract class BaseAbstract
     protected $memcache;
 
     /**
+     * This is the name: new Zend_Auth_Storage_Session('ezSession')
      * @var string
      */
-    protected $table = 'session2';
+    protected $sessionName = 'ezSession';
 
     /**
      * Bootstrap this.
@@ -72,7 +73,7 @@ abstract class BaseAbstract
      * @param \Zend_Db_Adapter_Abstract $db
      * @param boolean                   $debug
      *
-     * @return $this
+     * @return \Lagged\Session\BaseAbstract
      * @throws \InvalidArgumentException
      */
     public function __construct(\memcache $memcache, \Zend_Db_Adapter_Abstract $db, $debug = false)
