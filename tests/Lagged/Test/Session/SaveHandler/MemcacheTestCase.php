@@ -11,7 +11,6 @@ use Lagged\Session\Helper;
  * @package  Lagged\Session\SaveHandler\Memcache
  * @author   Till Klampaeckel <till@php.net>
  *
- * @runTestsInSeparateProcesses
  */
 class MemcacheTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -19,6 +18,7 @@ class MemcacheTestCase extends \PHPUnit_Framework_TestCase
      * This is an integration test for our custom session handler.
      *
      * @return void
+     * @runInSeparateProcess
      */
     public function testSomething()
     {
