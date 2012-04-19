@@ -15,6 +15,53 @@ use Lagged\Session\Helper;
 class MemcacheTestCase extends \PHPUnit_Framework_TestCase
 {
     /**
+     * Memcache object!
+     * @var \Memcache
+     * @see self::setUpMemcache();
+     */
+    protected $memcache;
+
+    /**
+     * Confirm standard set/get.
+     *
+     * @return void
+     */
+    public function testMemcacheSet()
+    {
+        $this->memcache = $this->setUpMemcache();
+        $key            = 'foo';
+        $data           = 'foo|s:3:"bar"';
+        $compression    = \MEMCACHE_COMPRESSED;
+
+        $this->memcache->set($key, $data, $compression);
+        $this->assertSame($data, $this->memcache->get($key, $compression));
+    }
+
+    /**
+     * Test writing a session - directly.
+     *
+     * @return void
+     */
+    public function testWriteRead()
+    {
+        $this->memcache = $this->setUpMemcache();
+        $db             = $this->setUpDb();
+        $session_id     = 'session_id';
+        $data           = 'foo|s:3:"bar"';
+
+        $handler          = new MemcacheSession($this->memcache, $db, true);
+        $handler->testing = true;
+
+        $this->assertTrue($handler->write($session_id, $data));
+
+        $sessionData  = $handler->read($session_id);
+        $memcacheData = $this->memcache->get($session_id, \MEMCACHE_COMPRESSED);
+
+        $this->assertSame($data, $memcacheData);
+        $this->assertSame($data, $sessionData);
+    }
+
+    /**
      * This is an integration test for our custom session handler.
      *
      * @return void
