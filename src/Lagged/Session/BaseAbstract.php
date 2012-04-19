@@ -19,16 +19,23 @@ use Lagged\Session\SaveHandler\Memcache;
 use Lagged\Session\MysqlWrapper;
 
 /**
+ * A base class for the session handlers.
  *
+ * @property-write int     $compression Memcache compression, only applicable for the Memcache session handler.
+ * @property-write boolean $debug       Noisy logs are noisy.
+ * @property-write int     $expire      The expiration of the session.
+ * @property-write string  $sessionName The name of the session (see {@link self::getUserId()}).
+ * @property-write string  $table       The name of the session table in MySQL.
+ *
+ * @category Session
+ * @package  Lagged\Session
+ * @author   Till Klampaeckel <till@php.net>
+ * @license  New BSD License http://www.opensource.org/licenses/bsd-license.php
+ * @version  GIT: $Id$
+ * @link     http://github.com/lagged/Lagged_Zend_Session_SaveHandler_Memcache
  */
 abstract class BaseAbstract
 {
-    /**
-     * Compression? Yes? If not: 0.
-     * @var int
-     */
-    protected $compression = \MEMCACHE_COMPRESSED;
-
     /**
      * Database connection.
      * @var MysqlWrapper
@@ -85,12 +92,17 @@ abstract class BaseAbstract
      * @param string $value
      *
      * @return $this
-     * @throws \RuntimeException On attempt to overwrite a value we don't allow.
+     * @throws \LogicException           When a value cannot be set.
+     * @throws \InvalidArgumentException When a value is invalid (duh!).
+     * @throws \RuntimeException         On attempt to overwrite a value we don't allow.
      */
     public function __set($var, $value)
     {
         switch ($var) {
             case 'compression':
+                if (!($this instanceof Memcache)) {
+                    throw new \LogicException("This value is only required with Memcache.");
+                }
                 if ($value !== 0 && $value !== \MEMCACHE_COMPRESSED) {
                     throw new \InvalidArgumentException("Illegal compression value.");
                 }
