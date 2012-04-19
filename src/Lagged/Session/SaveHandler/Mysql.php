@@ -18,24 +18,28 @@ namespace Lagged\Session\SaveHandler;
 
 use Lagged\Session\BaseAbstract;
 use Lagged\Session\Helper;
+use Lagged\Session\MysqlWrapper;
 
 /**
  * @category   Session
  * @package    Lagged\Session
- * @subpackage Lagged\Session\SaveHandler\Memcache
+ * @subpackage Lagged\Session\SaveHandler\Mysql
  * @author     Till Klampaeckel <till@php.net>
  * @license    New BSD License http://www.opensource.org/licenses/bsd-license.php
  * @version    Release: @package_version@
  * @link       http://github.com/lagged/Lagged_Zend_Session_SaveHandler_Memcache
- * @todo       All the MySQL code is duplicate in here.
  */
 class Mysql extends BaseAbstract implements \Zend_Session_SaveHandler_Interface
 {
     /**
-     * This is the name: new Zend_Auth_Storage_Session('ezSession')
-     * @var string
+     * @param \Zend_Db_Adapter_Mysqli $db
+     *
+     * @return $this
      */
-    protected $sessionName = 'ezSession';
+    public function __construct(\Zend_Db_Adapter_Mysqli $db)
+    {
+        $this->db = new MysqlWrapper($db->getConnection());
+    }
 
     /**
      * Read the session data.
@@ -46,28 +50,16 @@ class Mysql extends BaseAbstract implements \Zend_Session_SaveHandler_Interface
      */
     public function read($id)
     {
-        $sql = sprintf(
-            "SELECT session_data FROM `%s` WHERE session_id = '%s'",
-            $this->table,
-            $this->db->real_escape_string($id)
-        );
-        $res = $this->query($sql);
-        if (false === $res) {
-            // db error
-            $this->debug(sprintf("MySQL error: '%s', session: '%s'", $this->db->error, $id));
+        $session_data = $this->db->find($id);
+        if (false === $session_data) {
+            $this->debug(sprintf("MySQL error: '%s', session: '%s'", $this->db->getError(), $id));
             return '';
         }
-        if ($res->num_rows == 0) {
+        if (empty($session_data)) {
             $this->debug(sprintf("No session '%s' in MySQL.", $id));
-            return '';
+        } else {
+            $this->debug(sprintf("Found session '%s' in MySQL", $id));
         }
-        while ($row = $res->fetch_object()) {
-            $session_data = $row->session_data;
-            break;
-        }
-        $this->debug(sprintf("Found session '%s' in MySQL", $id));
-        $res->close();
-
         return $session_data;
     }
 
@@ -81,29 +73,10 @@ class Mysql extends BaseAbstract implements \Zend_Session_SaveHandler_Interface
      */
     public function write ($id, $data)
     {
-        $session_id   = $this->db->real_escape_string($id);
-        $session_data = $this->db->real_escape_string($data);
-
-        $user_id = $this->getUserId($data);
-
-        $sql  = sprintf("INSERT INTO `%s` (", $this->table);
-        $sql .= " session_id, session_data, user_id, rec_dateadd, rec_datemod";
-        $sql .= " )";
-        $sql .= " VALUES(";
-        $sql .= sprintf(" '%s', '%s', '%s', NOW(), NOW()",
-            $session_id,
-            $session_data,
-            $user_id
-        );
-        $sql .= " )";
-        $sql .= " ON DUPLICATE KEY UPDATE";
-        $sql .= sprintf(" session_data = '%s',", $session_data);
-        $sql .= sprintf(" user_id = %s,", $user_id);
-        $sql .= " rec_datemod = NOW()";
-
-        $status = $this->query($sql);
+        $user   = $this->getUserId($data);
+        $status = $this->db->save($id, $data, $user);
         if (false === $status) {
-            $this->debug(sprintf("Failed writing session '%s' to MySQL: %s", $id, $this->db->error));
+            $this->debug(sprintf("Failed writing session '%s' to MySQL: %s", $id, $this->db->getError()));
         }
     }
 
@@ -139,12 +112,7 @@ class Mysql extends BaseAbstract implements \Zend_Session_SaveHandler_Interface
      */
     public function destroy($id)
     {
-        $sql = sprintf(
-            "DELETE FROM %s WHERE session_id = %s",
-            $this->table,
-            $this->db->real_escape_string($id)
-        );
-        $status = $this->query($sql);
+        $status = $this->db->destroy($id);
         if (false === $status) {
             $this->debug(sprintf("Failed deleting session '%s' from MySQL.", $id));
             return;
