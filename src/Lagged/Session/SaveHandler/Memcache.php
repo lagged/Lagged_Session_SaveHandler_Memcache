@@ -31,10 +31,10 @@ use Lagged\Session\Helper;
 class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interface
 {
     /**
-     * This is the name: new Zend_Auth_Storage_Session('ezSession')
-     * @var string
+     * Compression? Yes? If not: 0.
+     * @var int
      */
-    protected $sessionName = 'ezSession';
+    protected $compression = \MEMCACHE_COMPRESSED;
 
     /**
      * Read the session data.
