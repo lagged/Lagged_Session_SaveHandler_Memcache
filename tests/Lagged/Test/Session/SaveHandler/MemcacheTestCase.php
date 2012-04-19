@@ -2,6 +2,7 @@
 namespace Lagged\Test\Session\SaveHandler;
 
 use Lagged\Session\SaveHandler\Memcache as MemcacheSession;
+use Lagged\Session\Helper;
 
 /**
  * This is an integration test.
@@ -48,7 +49,7 @@ class MemcacheTestCase extends \PHPUnit_Framework_TestCase
         $session_memcache_raw = $memcache->get($session_id, \MEMCACHE_COMPRESSED);
         $this->assertInternalType('string', $session_memcache_raw);
 
-        $session_memcache = $handler->decode($session_memcache_raw);
+        $session_memcache = Helper::decode($session_memcache_raw);
 
         $this->assertArrayHasKey('foo', $session_memcache);
         $this->assertEquals('bar', $session_memcache['foo']);
@@ -62,7 +63,7 @@ class MemcacheTestCase extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($session_memcache_raw, $session_sql_raw);
 
-        $session_sql = $handler->decode($session_sql_raw);
+        $session_sql = Helper::decode($session_sql_raw);
 
         $this->assertArrayHasKey('foo', $session_sql);
         $this->assertEquals('bar', $session_sql['foo']);
