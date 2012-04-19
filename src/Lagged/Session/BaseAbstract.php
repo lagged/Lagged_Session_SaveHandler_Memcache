@@ -26,6 +26,7 @@ use Lagged\Session\MysqlWrapper;
  * @property-write int     $expire      The expiration of the session.
  * @property-write string  $sessionName The name of the session (see {@link self::getUserId()}).
  * @property-write string  $table       The name of the session table in MySQL.
+ * @property-write boolean $testing     Throw exceptions.
  *
  * @category Session
  * @package  Lagged\Session
