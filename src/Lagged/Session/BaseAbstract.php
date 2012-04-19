@@ -15,6 +15,9 @@
  */
 namespace Lagged\Session;
 
+use Lagged\Session\SaveHandler\Memcache;
+use Lagged\Session\MysqlWrapper;
+
 /**
  *
  */
@@ -28,7 +31,7 @@ abstract class BaseAbstract
 
     /**
      * Database connection.
-     * @var \mysqli
+     * @var MysqlWrapper
      */
     protected $db;
 
@@ -68,7 +71,7 @@ abstract class BaseAbstract
     public function __construct(\memcache $memcache, \Zend_Db_Adapter_Abstract $db, $debug = false)
     {
         $this->memcache = $memcache;
-        $this->db       = $db->getConnection();
+        $this->db       = new MysqlWrapper($db->getConnection());
         if (!is_bool($debug)) {
             throw new \InvalidArgumentException("'debug' must be boolean.");
         }
@@ -103,7 +106,7 @@ abstract class BaseAbstract
                 $this->expire = $value;
                 break;
             case 'table':
-                $this->table = $value;
+                $this->db->setTable($value);
                 break;
             case 'sessionName':
                 $this->sessionName = $value;
@@ -143,7 +146,7 @@ abstract class BaseAbstract
         $userId  = 'NULL';
         if (isset($session[$this->sessionName])) {
             if (isset($session[$this->sessionName]['storage'])) {
-                $userId = $this->db->real_escape_string($session[$this->sessionName]['storage']['id']);
+                $userId = $session[$this->sessionName]['storage']['id'];
             }
         }
         return $userId;
@@ -164,28 +167,6 @@ abstract class BaseAbstract
             $logger = new \Zend_Log();
             $logger->addWriter($writer);
         }
-        $logger->debug($message);
-    }
-
-    /**
-     * Run the MySQL query, by default asynchronously.
-     *
-     * @param string $sql
-     *
-     * @return mixed
-     */
-    protected function query($sql)
-    {
-        if (substr($sql, 0, 6) == 'SELECT') {
-            $mode = \MYSQLI_STORE_RESULT;
-        } else {
-            $mode = \MYSQLI_ASYNC;
-        }
-        $result = $this->db->query($sql, $mode);
-        if (false === $result) {
-            $message = "Query: %s, Error: %s";
-            $this->log(sprintf($message, $sql, $this->db->error));
-        }
-        return $result;
+        $logger->log($message, \Zend_Log::DEBUG);
     }
 }
