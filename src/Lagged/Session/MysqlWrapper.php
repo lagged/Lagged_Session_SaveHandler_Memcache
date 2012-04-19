@@ -6,17 +6,26 @@
  *
  * PHP Version 5.3
  *
- * @category   Session
- * @package    Lagged\Session
- * @subpackage Lagged\Session\MysqlWrapper
- * @author     Till Klampaeckel <till@php.net>
- * @license    New BSD License http://www.opensource.org/licenses/bsd-license.php
- * @version    GIT: $Id$
- * @link       http://github.com/lagged/Lagged_Zend_Session_SaveHandler_Memcache
+ * @category Database
+ * @package  Lagged\Session
+ * @author   Till Klampaeckel <till@php.net>
+ * @license  New BSD License http://www.opensource.org/licenses/bsd-license.php
+ * @version  GIT: $Id$
+ * @link     http://github.com/lagged/Lagged_Zend_Session_SaveHandler_Memcache
  */
 namespace Lagged\Session;
 
 
+/**
+ * A wrapper around all necessary MySQL calls.
+ *
+ * @category Database
+ * @package  Lagged\Session
+ * @author   Till Klampaeckel <till@php.net>
+ * @license  New BSD License http://www.opensource.org/licenses/bsd-license.php
+ * @version  GIT: $Id$
+ * @link     http://github.com/lagged/Lagged_Zend_Session_SaveHandler_Memcache
+ */
 class MysqlWrapper
 {
     /**
