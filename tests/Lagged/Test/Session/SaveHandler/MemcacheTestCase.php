@@ -69,10 +69,10 @@ class MemcacheTestCase extends \PHPUnit_Framework_TestCase
      */
     public function testSomething()
     {
-        $memcache = $this->setUpMemcache();
-        $db       = $this->setUpDb();
+        $this->memcache = $this->setUpMemcache();
+        $db             = $this->setUpDb();
 
-        $handler = new MemcacheSession($memcache, $db);
+        $handler = new MemcacheSession($this->memcache, $db, true);
         $this->assertInstanceOf('\Lagged\Session\SaveHandler\Memcache', $handler);
 
         $status = session_set_save_handler(
@@ -91,20 +91,29 @@ class MemcacheTestCase extends \PHPUnit_Framework_TestCase
         $_SESSION['foo'] = 'bar';
         session_write_close();
 
-        $db = $this->setUpDb();
-
-        $session_memcache_raw = $memcache->get($session_id, \MEMCACHE_COMPRESSED);
-        $this->assertInternalType('string', $session_memcache_raw);
+        $session_memcache_raw = $this->memcache->get($session_id, \MEMCACHE_COMPRESSED);
+        $this->assertInternalType(
+            'string',
+            $session_memcache_raw,
+            sprintf("Memcache did not give us a string (session: %s): %s",
+                $session_id,
+                gettype($session_memcache_raw)
+            )
+        );
 
         $session_memcache = Helper::decode($session_memcache_raw);
 
         $this->assertArrayHasKey('foo', $session_memcache);
         $this->assertEquals('bar', $session_memcache['foo']);
 
-        $session_sql_raw = $db->fetchOne(
+        /**
+         * @var $newDb \Mysqli A new DB connection because the other won't be in sync!
+         */
+        $newDb           = $this->setUpDb();
+        $session_sql_raw = $newDb->fetchOne(
             sprintf("SELECT session_data FROM %s WHERE session_id = %s",
                 'session2',
-                $db->quote($session_id)
+                $newDb->quote($session_id)
             )
         );
 
