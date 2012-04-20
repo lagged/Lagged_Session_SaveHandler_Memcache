@@ -21,18 +21,6 @@ class MemcacheTestCase extends \PHPUnit_Framework_TestCase
      */
     protected $memcache;
 
-    public function setUp()
-    {
-        if (!extension_loaded('memcache')) {
-            $this->markTestSkipped("Test requires ext/memcache");
-            return;
-        }
-        if (!extension_loaded('mysqli')) {
-            $this->markTestSkipped("Test requires ext/mysql");
-            return;
-        }
-    }
-
     /**
      * Confirm standard set/get.
      *
@@ -147,6 +135,15 @@ class MemcacheTestCase extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
+        if (!extension_loaded('memcache')) {
+            $this->markTestSkipped("Test requires ext/memcache");
+            return;
+        }
+        if (!extension_loaded('mysqli')) {
+            $this->markTestSkipped("Test requires ext/mysql");
+            return;
+        }
+
         $config = $this->getDbConfiguration();
 
         $db = new \mysqli($config['host'], $config['username'], $config['password']);
