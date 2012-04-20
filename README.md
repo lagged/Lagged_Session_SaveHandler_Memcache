@@ -2,6 +2,8 @@
 
 This code already evolved into two session handlers!
 
+[![Build Status](https://secure.travis-ci.org/lagged/Lagged_Session_SaveHandler_Memcache.png?branch=master)](http://travis-ci.org/lagged/Lagged_Session_SaveHandler_Memcache)
+
 ## Lagged\Session\SaveHandler\Memcache
 
 This is a Memcache session handler for Zend Framework with MySQL persistence.
