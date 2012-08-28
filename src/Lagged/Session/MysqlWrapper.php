@@ -29,8 +29,7 @@ namespace Lagged\Session;
 class MysqlWrapper
 {
     /**
-     * Mysql resource
-     * @var \mysqli
+     * @var \Zend_Db_Adapter_Abstract
      */
     protected $db;
 
@@ -41,12 +40,12 @@ class MysqlWrapper
     protected $table;
 
     /**
-     * @param \mysqli $db
-     * @param string  $table
+     * @param \Zend_Db_Adapter_Abstract $db
+     * @param string                    $table
      *
      * @return \Lagged\Session\MysqlWrapper
      */
-    public function __construct(\mysqli $db, $table = 'session2')
+    public function __construct(\Zend_Db_Adapter_Abstract $db, $table = 'session2')
     {
         $this->db    = $db;
         $this->table = $table;
@@ -59,10 +58,12 @@ class MysqlWrapper
      */
     public function destroy($id)
     {
+        $db = $this->db->getConnection();
+
         $sql = sprintf(
             "DELETE FROM %s WHERE session_id = %s",
             $this->table,
-            $this->db->real_escape_string($id)
+            $db->real_escape_string($id)
         );
         $status = $this->query($sql);
         return $status;
@@ -75,10 +76,12 @@ class MysqlWrapper
      */
     public function find($id)
     {
+        $db = $this->db->getConnection();
+
         $sql = sprintf(
             "SELECT session_data FROM `%s` WHERE session_id = '%s'",
             $this->table,
-            $this->db->real_escape_string($id)
+            $db->real_escape_string($id)
         );
         $res = $this->query($sql);
         if (false === $res) {
@@ -100,7 +103,8 @@ class MysqlWrapper
      */
     public function getError()
     {
-        return $this->db->error;
+        $db = $this->db->getConnection();
+        return $db->error;
     }
 
     /**
@@ -112,9 +116,11 @@ class MysqlWrapper
      */
     public function save($id, $data, $user)
     {
-        $session_id   = $this->db->real_escape_string($id);
-        $session_data = $this->db->real_escape_string($data);
-        $user_id      = $this->db->real_escape_string($user);
+        $db = $this->db->getConnection();
+
+        $session_id   = $db->real_escape_string($id);
+        $session_data = $db->real_escape_string($data);
+        $user_id      = $db->real_escape_string($user);
 
         $sql  = sprintf("INSERT INTO `%s` (", $this->table);
         $sql .= " session_id, session_data, user_id, rec_dateadd, rec_datemod";
@@ -144,12 +150,14 @@ class MysqlWrapper
      */
     protected function query($sql)
     {
+        $db = $this->db->getConnection();
+
         if (substr($sql, 0, 6) == 'SELECT') {
             $mode = \MYSQLI_STORE_RESULT;
         } else {
             $mode = \MYSQLI_ASYNC;
         }
-        $result = $this->db->query($sql, $mode);
+        $result = $db->query($sql, $mode);
         return $result;
     }
 

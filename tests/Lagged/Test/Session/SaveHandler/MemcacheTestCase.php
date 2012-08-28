@@ -189,10 +189,13 @@ class MemcacheTestCase extends \PHPUnit_Framework_TestCase
     protected function getDbConfiguration()
     {
         return array(
-            'username' => 'root',
-            'password' => '',
-            'dbname'   => 'sessions',
-            'host'     => '127.0.0.1',
+            'username'       => 'root',
+            'password'       => '',
+            'dbname'         => 'sessions',
+            'host'           => '127.0.0.1',
+            'driver_options' => array(
+                'MYSQLI_OPT_CONNECT_TIMEOUT' => 5,
+            ),
         );
     }
     /**
