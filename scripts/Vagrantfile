@@ -1,0 +1,21 @@
+Vagrant::Config.run do |config|
+  config.vm.box = "lucid-nfs_0.1_4.1.0"
+
+  config.vm.network :hostonly, "33.33.33.126"
+
+  config.ssh.max_tries = 100
+
+  config.vm.customize [
+    "modifyvm", :id,
+    "--name", "Session VM",
+    "--memory", "512"
+  ]
+
+  config.vm.share_folder "v-data", "/vagrant_data", "./../"
+
+  config.vbguest.auto_update = true
+  config.vbguest.no_remote = true
+
+  config.vm.provision :shell, :path => "./vm-setup.sh"
+
+end

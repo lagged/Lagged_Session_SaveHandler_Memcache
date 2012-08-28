@@ -86,7 +86,7 @@ abstract class BaseAbstract
     public function __construct(\memcache $memcache, \Zend_Db_Adapter_Abstract $db, $debug = false)
     {
         $this->memcache = $memcache;
-        $this->db       = new MysqlWrapper($db->getConnection());
+        $this->db       = new MysqlWrapper($db);
         if (!is_bool($debug)) {
             throw new \InvalidArgumentException("'debug' must be boolean.");
         }

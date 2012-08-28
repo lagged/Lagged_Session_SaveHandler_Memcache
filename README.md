@@ -126,6 +126,12 @@ To use MySQL without Memcache:
     Zend_Session::setSaveHandler($saveHandler);
     register_shutdown_function('session_write_close');
 
+### Performance
+
+It's critical to set appropriate timeouts to MySQL:
+
+    database.driver_options.MYSQLI_OPT_CONNECT_TIMEOUT = 5
+
 ### Error Handling
 
 The code is designed to not throw Exceptions (from within the session handler) and to generally be quiet.
