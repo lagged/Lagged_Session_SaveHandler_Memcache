@@ -16,27 +16,34 @@
   <email>till@lagged.biz</email>
   <active>yes</active>
  </lead>
- <date>2012-04-15</date>
- <time>19:13:56</time>
+ <date>2012-08-28</date>
+ <time>14:29:02</time>
  <version>
-  <release>0.5.0</release>
-  <api>0.5.0</api>
+  <release>0.6.0</release>
+  <api>0.6.0</api>
  </version>
  <stability>
-  <release>alpha</release>
-  <api>alpha</api>
+  <release>beta</release>
+  <api>beta</api>
  </stability>
  <license uri="http://www.opensource.org/licenses/bsd-license.php">New BSD License</license>
  <notes>
-Initial release.
+Refactored MySQL usage inside the objects to avoid premature connecting to the mysqld.
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
+   <dir name="scripts">
+    <file baseinstalldir="/" name="travis-deps.sh" role="data" />
+    <file baseinstalldir="/" name="vm-setup.sh" role="data" />
+   </dir> <!-- /scripts -->
    <dir name="src">
     <dir name="Lagged">
      <dir name="Session">
       <dir name="SaveHandler">
        <file baseinstalldir="/" name="Memcache.php" role="php">
+        <tasks:replace from="@package_version@" to="version" type="package-info" />
+       </file>
+       <file baseinstalldir="/" name="Mysql.php" role="php">
         <tasks:replace from="@package_version@" to="version" type="package-info" />
        </file>
       </dir> <!-- /src/Lagged/Session/SaveHandler -->
@@ -47,6 +54,12 @@ Initial release.
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
       <file baseinstalldir="/" name="CacheSetup.php" role="php">
+       <tasks:replace from="@package_version@" to="version" type="package-info" />
+      </file>
+      <file baseinstalldir="/" name="Helper.php" role="php">
+       <tasks:replace from="@package_version@" to="version" type="package-info" />
+      </file>
+      <file baseinstalldir="/" name="MysqlWrapper.php" role="php">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
      </dir> <!-- /src/Lagged/Session -->
@@ -67,6 +80,7 @@ Initial release.
    <dir name="var">
     <file baseinstalldir="/" name="session.sql" role="data" />
    </dir> <!-- /var -->
+   <file baseinstalldir="/" name="CHANGELOG.md" role="data" />
    <file baseinstalldir="/" name="README.md" role="doc" />
   </dir> <!-- / -->
  </contents>
@@ -101,7 +115,10 @@ Initial release.
    <install as="Lagged/Session/Autoload.php" name="src/Lagged/Session/Autoload.php" />
    <install as="Lagged/Session/BaseAbstract.php" name="src/Lagged/Session/BaseAbstract.php" />
    <install as="Lagged/Session/CacheSetup.php" name="src/Lagged/Session/CacheSetup.php" />
+   <install as="Lagged/Session/Helper.php" name="src/Lagged/Session/Helper.php" />
+   <install as="Lagged/Session/MysqlWrapper.php" name="src/Lagged/Session/MysqlWrapper.php" />
    <install as="Lagged/Session/SaveHandler/Memcache.php" name="src/Lagged/Session/SaveHandler/Memcache.php" />
+   <install as="Lagged/Session/SaveHandler/Mysql.php" name="src/Lagged/Session/SaveHandler/Mysql.php" />
   </filelist>
  </phprelease>
  <changelog>
@@ -118,6 +135,21 @@ Initial release.
    <license uri="http://www.opensource.org/licenses/bsd-license.php">New BSD License</license>
    <notes>
 Initial release.
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>0.6.0</release>
+    <api>0.6.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2012-08-28</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">New BSD License</license>
+   <notes>
+Refactored MySQL usage inside the objects to avoid premature connecting to the mysqld.
    </notes>
   </release>
  </changelog>
