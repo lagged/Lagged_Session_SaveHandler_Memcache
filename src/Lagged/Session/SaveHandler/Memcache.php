@@ -52,7 +52,13 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
             return $session;
         }
 
-        $session_data = $this->db->find($id);
+        try {
+            $session_data = $this->db->find($id);
+        } catch (\RuntimeException $e) {
+            $this->debug(sprintf("DB RuntimeException: %s", $e->getMessage()));
+            return '';
+        }
+
         if (false === $session_data) {
             // db error
             $this->debug(sprintf("MySQL error: '%s', session: '%s'", $this->db->error, $id));
@@ -97,8 +103,15 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
             $this->debug(sprintf("Memcache::replace() success: '%s'", $id));
         }
 
-        $user   = $this->getUserId($data);
-        $status = $this->db->save($id, $data, $user);
+        $user = $this->getUserId($data);
+
+        try {
+            $status = $this->db->save($id, $data, $user);
+        } catch (\RuntimeException $e) {
+            $this->debug(sprintf("DB RuntimeException: %s", $e->getMessage()));
+            return false;
+        }
+
         if (false === $status) {
             $msg = sprintf("Failed writing session '%s' to MySQL: %s", $id, $this->db->getError());
             if (true === $this->testing) {
@@ -145,7 +158,13 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
         $this->memcache->delete($id);
         $this->debug(sprintf("Deleted session '%s' from Memcache.", $id));
 
-        $status = $this->db->destroy($id);
+        try {
+            $status = $this->db->destroy($id);
+        } catch (\RuntimeException $e) {
+            $this->debug(sprintf("DB RuntimeException: %s", $e->getMessage()));
+            return;
+        }
+
         if (false === $status) {
             $msg = sprintf("Failed deleting session '%s' from MySQL.", $id);
             if (true === $this->testing) {
