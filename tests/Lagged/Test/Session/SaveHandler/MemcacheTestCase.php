@@ -106,7 +106,7 @@ class MemcacheTestCase extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('foo', $session_memcache);
         $this->assertEquals('bar', $session_memcache['foo']);
 
-        $db->close();
+        $db->closeConnection();
         sleep(1); // this is lame
 
         /**
