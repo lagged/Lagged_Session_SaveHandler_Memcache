@@ -106,16 +106,19 @@ class MemcacheTestCase extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('foo', $session_memcache);
         $this->assertEquals('bar', $session_memcache['foo']);
 
+        $db->close();
+        sleep(1); // this is lame
+
         /**
          * @var $newDb \Mysqli A new DB connection because the other won't be in sync!
          */
-        $newDb           = $this->setUpDb();
-        $session_sql_raw = $newDb->fetchOne(
-            sprintf("SELECT session_data FROM %s WHERE session_id = %s",
-                'session2',
-                $newDb->quote($session_id)
-            )
+        $newDb = $this->setUpDb();
+        $query = sprintf("SELECT session_data FROM %s WHERE session_id = %s",
+            'session2',
+            $newDb->quote($session_id)
         );
+
+        $session_sql_raw = $newDb->fetchOne($query);
 
         $this->assertSame($session_memcache_raw, $session_sql_raw);
 
