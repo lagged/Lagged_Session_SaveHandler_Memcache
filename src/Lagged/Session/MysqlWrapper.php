@@ -52,13 +52,28 @@ class MysqlWrapper
     }
 
     /**
+     * Initializes the connection.
+     *
+     * @return \mysqli
+     * @throws \RuntimeException
+     */
+    protected function connect()
+    {
+        try {
+            return $this->db->getConnection();
+        } catch (Zend_Db_Exception $e) {
+            throw new \RuntimeException("Could not connect to database.", null, $e);
+        }
+    }
+
+    /**
      * @param $id
      *
      * @return mixed
      */
     public function destroy($id)
     {
-        $db = $this->db->getConnection();
+        $db = $this->connect();
 
         $sql = sprintf(
             "DELETE FROM %s WHERE session_id = %s",
@@ -76,7 +91,7 @@ class MysqlWrapper
      */
     public function find($id)
     {
-        $db = $this->db->getConnection();
+        $db = $this->connect();
 
         $sql = sprintf(
             "SELECT session_data FROM `%s` WHERE session_id = '%s'",
@@ -103,7 +118,7 @@ class MysqlWrapper
      */
     public function getError()
     {
-        $db = $this->db->getConnection();
+        $db = $this->connect();
         return $db->error;
     }
 
@@ -116,7 +131,7 @@ class MysqlWrapper
      */
     public function save($id, $data, $user)
     {
-        $db = $this->db->getConnection();
+        $db = $this->connect();
 
         $session_id   = $db->real_escape_string($id);
         $session_data = $db->real_escape_string($data);
@@ -150,7 +165,7 @@ class MysqlWrapper
      */
     protected function query($sql)
     {
-        $db = $this->db->getConnection();
+        $db = $this->connect();
 
         if (substr($sql, 0, 6) == 'SELECT') {
             $mode = \MYSQLI_STORE_RESULT;
