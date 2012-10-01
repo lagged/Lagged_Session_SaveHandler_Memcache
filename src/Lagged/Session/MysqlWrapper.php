@@ -58,7 +58,10 @@ class MysqlWrapper
      */
     public function destroy($id)
     {
-        $db = $this->db->getConnection();
+        $db = $this->getConnection();
+        if (false === $db) {
+            return false;
+        }
 
         $sql = sprintf(
             "DELETE FROM %s WHERE session_id = %s",
@@ -76,7 +79,10 @@ class MysqlWrapper
      */
     public function find($id)
     {
-        $db = $this->db->getConnection();
+        $db = $this->getConnection();
+        if (false === $db) {
+            return false;
+        }
 
         $sql = sprintf(
             "SELECT session_data FROM `%s` WHERE session_id = '%s'",
@@ -103,7 +109,10 @@ class MysqlWrapper
      */
     public function getError()
     {
-        $db = $this->db->getConnection();
+        $db = $this->getConnection();
+        if (false === $db) {
+            return '';
+        }
         return $db->error;
     }
 
@@ -116,7 +125,10 @@ class MysqlWrapper
      */
     public function save($id, $data, $user)
     {
-        $db = $this->db->getConnection();
+        $db = $this->getConnection();
+        if (false === $db) {
+            return false;
+        }
 
         $session_id   = $db->real_escape_string($id);
         $session_data = $db->real_escape_string($data);
@@ -142,6 +154,24 @@ class MysqlWrapper
     }
 
     /**
+     * Wrap {@link \Zend_Db_Adapter_Abstract::getConnection().
+     *
+     * @return \mysqli|false
+     */
+    protected function getConnection()
+    {
+        static $conn;
+        if (null === $conn) {
+            try {
+                $conn = $this->db->getConnection();
+            } catch (\Zend_Exception $e) {
+                return false;
+            }
+        }
+        return $conn;
+    }
+
+    /**
      * Run the MySQL query, by default asynchronously.
      *
      * @param string $sql
@@ -150,7 +180,10 @@ class MysqlWrapper
      */
     protected function query($sql)
     {
-        $db = $this->db->getConnection();
+        $db = $this->getConnection();
+        if (false === $db) {
+            return false;
+        }
 
         if (substr($sql, 0, 6) == 'SELECT') {
             $mode = \MYSQLI_STORE_RESULT;
