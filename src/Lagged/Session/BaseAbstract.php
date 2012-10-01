@@ -87,9 +87,11 @@ abstract class BaseAbstract
     {
         $this->memcache = $memcache;
         $this->db       = new MysqlWrapper($db);
+
         if (!is_bool($debug)) {
             throw new \InvalidArgumentException("'debug' must be boolean.");
         }
+
         $this->debug = $debug;
     }
 
@@ -133,6 +135,7 @@ abstract class BaseAbstract
                 throw new \InvalidArgumentException("Testing can be either 'true' or 'false'");
             }
             $this->testing = $value;
+            $this->db->setTesting($value);
             break;
         case 'sessionName':
             $this->sessionName = $value;
