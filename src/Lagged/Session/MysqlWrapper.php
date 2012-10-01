@@ -40,6 +40,12 @@ class MysqlWrapper
     protected $table;
 
     /**
+     * Testing, yes, no?
+     * @var bool
+     */
+    protected $testing = false;
+
+    /**
      * @param \Zend_Db_Adapter_Abstract $db
      * @param string                    $table
      *
@@ -185,11 +191,13 @@ class MysqlWrapper
             return false;
         }
 
-        if (substr($sql, 0, 6) == 'SELECT') {
-            $mode = \MYSQLI_STORE_RESULT;
-        } else {
-            $mode = \MYSQLI_ASYNC;
+        $mode = \MYSQLI_STORE_RESULT;
+        if (substr(strtoupper($sql), 0, 6) != 'SELECT') {
+            if (false === $testing) {
+                $mode = \MYSQLI_ASYNC;
+            }
         }
+
         $result = $db->query($sql, $mode);
         return $result;
     }
@@ -202,6 +210,22 @@ class MysqlWrapper
     public function setTable($table)
     {
         $this->table = $table;
+        return $this;
+    }
+
+    /**
+     * Enable testing.
+     *
+     * @param bool $flag
+     *
+     * @return $this
+     */
+    public function setTesting($flag)
+    {
+        if (!is_bool($flag)) {
+            throw new \InvalidArgumentException("Flag must be a boolean.");
+        }
+        $this->testing = $testing;
         return $this;
     }
 }
