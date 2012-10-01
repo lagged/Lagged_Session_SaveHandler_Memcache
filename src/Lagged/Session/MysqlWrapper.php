@@ -144,15 +144,19 @@ class MysqlWrapper
         $sql .= " session_id, session_data, user_id, rec_dateadd, rec_datemod";
         $sql .= " )";
         $sql .= " VALUES(";
-        $sql .= sprintf(" '%s', '%s', '%s', NOW(), NOW()",
+        $sql .= sprintf(" '%s', '%s', %s, NOW(), NOW()",
             $session_id,
             $session_data,
-            $user_id
+            (($user !== null)?$user_id:'NULL')
         );
         $sql .= " )";
         $sql .= " ON DUPLICATE KEY UPDATE";
         $sql .= sprintf(" session_data = '%s',", $session_data);
-        $sql .= sprintf(" user_id = %s,", $user_id);
+
+        if (null !== $user) {
+            $sql .= sprintf(" user_id = %d,", $user_id);
+        }
+
         $sql .= " rec_datemod = NOW()";
 
         $status = $this->query($sql);
