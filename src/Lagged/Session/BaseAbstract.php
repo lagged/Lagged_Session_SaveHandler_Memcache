@@ -87,9 +87,11 @@ abstract class BaseAbstract
     {
         $this->memcache = $memcache;
         $this->db       = new MysqlWrapper($db);
+
         if (!is_bool($debug)) {
             throw new \InvalidArgumentException("'debug' must be boolean.");
         }
+
         $this->debug = $debug;
     }
 
@@ -133,6 +135,7 @@ abstract class BaseAbstract
                 throw new \InvalidArgumentException("Testing can be either 'true' or 'false'");
             }
             $this->testing = $value;
+            $this->db->setTesting($value);
             break;
         case 'sessionName':
             $this->sessionName = $value;
@@ -169,10 +172,13 @@ abstract class BaseAbstract
     protected function getUserId($data)
     {
         $session = Helper::decode($data);
-        $userId  = 'NULL';
+        $userId  = NULL;
         if (isset($session[$this->sessionName])) {
             if (isset($session[$this->sessionName]['storage'])) {
-                $userId = $session[$this->sessionName]['storage']['id'];
+                $id = (int) $session[$this->sessionName]['storage']['id'];
+                if ($id > 0) {
+                    $userId = $id;
+                }
             }
         }
         return $userId;
@@ -189,7 +195,11 @@ abstract class BaseAbstract
     {
         static $logger;
         if (null === $logger) {
-            $writer = new \Zend_Log_Writer_Syslog(array('application' => __CLASS__));
+            if (true !== $this->testing) {
+                $writer = new \Zend_Log_Writer_Syslog(array('application' => __CLASS__));
+            } else {
+                $writer = new \Zend_Log_Writer_Stream('php://output');
+            }
             $logger = new \Zend_Log();
             $logger->addWriter($writer);
         }

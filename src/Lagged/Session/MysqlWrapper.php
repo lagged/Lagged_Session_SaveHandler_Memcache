@@ -40,6 +40,12 @@ class MysqlWrapper
     protected $table;
 
     /**
+     * Testing, yes, no?
+     * @var bool
+     */
+    protected $testing = false;
+
+    /**
      * @param \Zend_Db_Adapter_Abstract $db
      * @param string                    $table
      *
@@ -58,7 +64,10 @@ class MysqlWrapper
      */
     public function destroy($id)
     {
-        $db = $this->db->getConnection();
+        $db = $this->getConnection();
+        if (false === $db) {
+            return false;
+        }
 
         $sql = sprintf(
             "DELETE FROM %s WHERE session_id = %s",
@@ -76,7 +85,10 @@ class MysqlWrapper
      */
     public function find($id)
     {
-        $db = $this->db->getConnection();
+        $db = $this->getConnection();
+        if (false === $db) {
+            return false;
+        }
 
         $sql = sprintf(
             "SELECT session_data FROM `%s` WHERE session_id = '%s'",
@@ -103,7 +115,10 @@ class MysqlWrapper
      */
     public function getError()
     {
-        $db = $this->db->getConnection();
+        $db = $this->getConnection();
+        if (false === $db) {
+            return '';
+        }
         return $db->error;
     }
 
@@ -116,7 +131,10 @@ class MysqlWrapper
      */
     public function save($id, $data, $user)
     {
-        $db = $this->db->getConnection();
+        $db = $this->getConnection();
+        if (false === $db) {
+            return false;
+        }
 
         $session_id   = $db->real_escape_string($id);
         $session_data = $db->real_escape_string($data);
@@ -126,19 +144,41 @@ class MysqlWrapper
         $sql .= " session_id, session_data, user_id, rec_dateadd, rec_datemod";
         $sql .= " )";
         $sql .= " VALUES(";
-        $sql .= sprintf(" '%s', '%s', '%s', NOW(), NOW()",
+        $sql .= sprintf(" '%s', '%s', %s, NOW(), NOW()",
             $session_id,
             $session_data,
-            $user_id
+            (($user !== null)?$user_id:'NULL')
         );
         $sql .= " )";
         $sql .= " ON DUPLICATE KEY UPDATE";
         $sql .= sprintf(" session_data = '%s',", $session_data);
-        $sql .= sprintf(" user_id = %s,", $user_id);
+
+        if (null !== $user) {
+            $sql .= sprintf(" user_id = %d,", $user_id);
+        }
+
         $sql .= " rec_datemod = NOW()";
 
         $status = $this->query($sql);
         return $status;
+    }
+
+    /**
+     * Wrap {@link \Zend_Db_Adapter_Abstract::getConnection().
+     *
+     * @return \mysqli|false
+     */
+    protected function getConnection()
+    {
+        static $conn;
+        if (null === $conn) {
+            try {
+                $conn = $this->db->getConnection();
+            } catch (\Zend_Exception $e) {
+                return false;
+            }
+        }
+        return $conn;
     }
 
     /**
@@ -150,13 +190,18 @@ class MysqlWrapper
      */
     protected function query($sql)
     {
-        $db = $this->db->getConnection();
-
-        if (substr($sql, 0, 6) == 'SELECT') {
-            $mode = \MYSQLI_STORE_RESULT;
-        } else {
-            $mode = \MYSQLI_ASYNC;
+        $db = $this->getConnection();
+        if (false === $db) {
+            return false;
         }
+
+        $mode = \MYSQLI_STORE_RESULT;
+        if (substr(strtoupper($sql), 0, 6) != 'SELECT') {
+            if (false === $this->testing) {
+                $mode = \MYSQLI_ASYNC;
+            }
+        }
+
         $result = $db->query($sql, $mode);
         return $result;
     }
@@ -169,6 +214,22 @@ class MysqlWrapper
     public function setTable($table)
     {
         $this->table = $table;
+        return $this;
+    }
+
+    /**
+     * Enable testing.
+     *
+     * @param bool $flag
+     *
+     * @return $this
+     */
+    public function setTesting($flag)
+    {
+        if (!is_bool($flag)) {
+            throw new \InvalidArgumentException("Flag must be a boolean.");
+        }
+        $this->testing = $flag;
         return $this;
     }
 }
