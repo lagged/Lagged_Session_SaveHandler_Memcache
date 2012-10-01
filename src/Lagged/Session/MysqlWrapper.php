@@ -193,7 +193,7 @@ class MysqlWrapper
 
         $mode = \MYSQLI_STORE_RESULT;
         if (substr(strtoupper($sql), 0, 6) != 'SELECT') {
-            if (false === $testing) {
+            if (false === $this->testing) {
                 $mode = \MYSQLI_ASYNC;
             }
         }
@@ -225,7 +225,7 @@ class MysqlWrapper
         if (!is_bool($flag)) {
             throw new \InvalidArgumentException("Flag must be a boolean.");
         }
-        $this->testing = $testing;
+        $this->testing = $flag;
         return $this;
     }
 }
