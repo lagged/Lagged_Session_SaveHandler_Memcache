@@ -1,5 +1,6 @@
 <phpunit bootstrap="./tests/TestInit.php" colors="true">
     <testsuite name="MemcacheTestCase">
         <file>./tests/Lagged/Test/Session/SaveHandler/MemcacheTestCase.php</file>
+        <file>./tests/Lagged/Test/Session/SaveHandler/IntegrationTestCase.php</file>
     </testsuite>
 </phpunit>
