@@ -172,10 +172,13 @@ abstract class BaseAbstract
     protected function getUserId($data)
     {
         $session = Helper::decode($data);
-        $userId  = 'NULL';
+        $userId  = NULL;
         if (isset($session[$this->sessionName])) {
             if (isset($session[$this->sessionName]['storage'])) {
-                $userId = $session[$this->sessionName]['storage']['id'];
+                $id = (int) $session[$this->sessionName]['storage']['id'];
+                if ($id > 0) {
+                    $userId = $id;
+                }
             }
         }
         return $userId;
