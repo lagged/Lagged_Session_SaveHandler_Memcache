@@ -72,7 +72,9 @@ class MemcacheTestCase extends \PHPUnit_Framework_TestCase
         $this->memcache = $this->setUpMemcache();
         $db             = $this->setUpDb();
 
-        $handler = new MemcacheSession($this->memcache, $db, true);
+        $handler          = new MemcacheSession($this->memcache, $db, true);
+        $handler->testing = true;
+
         $this->assertInstanceOf('\Lagged\Session\SaveHandler\Memcache', $handler);
 
         $status = session_set_save_handler(
@@ -103,8 +105,8 @@ class MemcacheTestCase extends \PHPUnit_Framework_TestCase
 
         $session_memcache = Helper::decode($session_memcache_raw);
 
-        $this->assertArrayHasKey('foo', $session_memcache);
-        $this->assertEquals('bar', $session_memcache['foo']);
+        $this->assertArrayHasKey('foo', $session_memcache, "'foo' was not found in stored session.");
+        $this->assertEquals('bar', $session_memcache['foo'], "'foo' inside the session is not 'bar'");
 
         /**
          * @var $newDb \Mysqli A new DB connection because the other won't be in sync!
@@ -117,12 +119,12 @@ class MemcacheTestCase extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $this->assertSame($session_memcache_raw, $session_sql_raw);
+        $this->assertSame($session_memcache_raw, $session_sql_raw, "Memcache and SQL value are not equal.");
 
         $session_sql = Helper::decode($session_sql_raw);
 
-        $this->assertArrayHasKey('foo', $session_sql);
-        $this->assertEquals('bar', $session_sql['foo']);
+        $this->assertArrayHasKey('foo', $session_sql, "DB result does not have key 'foo'");
+        $this->assertEquals('bar', $session_sql['foo'], "'foo' (from SQL) is not 'bar'");
 
         $this->assertEquals($session_memcache, $session_sql);
     }
