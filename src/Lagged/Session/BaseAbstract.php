@@ -189,7 +189,11 @@ abstract class BaseAbstract
     {
         static $logger;
         if (null === $logger) {
-            $writer = new \Zend_Log_Writer_Syslog(array('application' => __CLASS__));
+            if (true !== $this->testing) {
+                $writer = new \Zend_Log_Writer_Syslog(array('application' => __CLASS__));
+            } else {
+                $writer = new \Zend_Log_Writer_Stream('php://output');
+            }
             $logger = new \Zend_Log();
             $logger->addWriter($writer);
         }
