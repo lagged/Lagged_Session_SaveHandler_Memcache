@@ -5,12 +5,12 @@ ini_set('date.timezone', 'Europe/Berlin');
 require_once 'PEAR/PackageFileManager2.php';
 PEAR::setErrorHandling(PEAR_ERROR_DIE);
 
-$api_version     = '0.6.0';
+$api_version     = '0.7.0';
 $api_state       = 'beta';
 
-$release_version = '0.6.0';
+$release_version = '0.7.0';
 $release_state   = 'beta';
-$release_notes   = "Refactored MySQL usage inside the objects to avoid premature connecting to the mysqld.";
+$release_notes   = "Refactored error handling.";
 
 $summary = "A Memcache-MySQL-based session handler for Zend Framework (1)";
 

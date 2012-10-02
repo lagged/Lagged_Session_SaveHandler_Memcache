@@ -3,3 +3,4 @@ before_script: ./scripts/travis-deps.sh
 php:
   - 5.3
   - 5.4
+script: phpunit --verbose --debug

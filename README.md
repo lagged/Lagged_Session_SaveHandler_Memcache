@@ -130,7 +130,17 @@ To use MySQL without Memcache:
 
 It's critical to set appropriate timeouts to MySQL:
 
-    database.driver_options.MYSQLI_OPT_CONNECT_TIMEOUT = 5
+    database.params.driver_options.MYSQLI_OPT_CONNECT_TIMEOUT = 5
+
+In pure PHP:
+
+    $db->options(\MYSQLI_OPT_CONNECT_TIMEOUT, 5);
+
+Or to `\Zend_Db`:
+
+    $config->database->params->driver_options = array(
+        \MYSQLI_OPT_CONNECT_TIMEOUT => 5,
+    );
 
 ### Error Handling
 
