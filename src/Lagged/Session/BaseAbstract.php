@@ -83,10 +83,13 @@ abstract class BaseAbstract
      * @return \Lagged\Session\BaseAbstract
      * @throws \InvalidArgumentException
      */
-    public function __construct(\memcache $memcache, \Zend_Db_Adapter_Abstract $db, $debug = false)
+    public function __construct(\memcache $memcache, \Zend_Db_Adapter_Abstract $db = null, $debug = false)
     {
         $this->memcache = $memcache;
-        $this->db       = new MysqlWrapper($db);
+
+        if ($db !== null) {
+            $this->db = new MysqlWrapper($db);
+        }
 
         if (!is_bool($debug)) {
             throw new \InvalidArgumentException("'debug' must be boolean.");

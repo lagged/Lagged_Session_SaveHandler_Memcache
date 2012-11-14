@@ -2,5 +2,6 @@
     <testsuite name="MemcacheTestCase">
         <file>./tests/Lagged/Test/Session/SaveHandler/MemcacheTestCase.php</file>
         <file>./tests/Lagged/Test/Session/SaveHandler/IntegrationTestCase.php</file>
+        <file>./tests/Lagged/Test/Session/SaveHandler/MemcacheNoPersistenceTestCase.php</file>
     </testsuite>
 </phpunit>
