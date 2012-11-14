@@ -83,10 +83,13 @@ abstract class BaseAbstract
      * @return \Lagged\Session\BaseAbstract
      * @throws \InvalidArgumentException
      */
-    public function __construct(\memcache $memcache, \Zend_Db_Adapter_Abstract $db, $debug = false)
+    public function __construct(\memcache $memcache, \Zend_Db_Adapter_Abstract $db = null, $debug = false)
     {
         $this->memcache = $memcache;
-        $this->db       = new MysqlWrapper($db);
+
+        if ($db !== null) {
+            $this->db = new MysqlWrapper($db);
+        }
 
         if (!is_bool($debug)) {
             throw new \InvalidArgumentException("'debug' must be boolean.");
@@ -128,14 +131,18 @@ abstract class BaseAbstract
             $this->expire = $value;
             break;
         case 'table':
-            $this->db->setTable($value);
+            if ($this->db !== null) {
+                $this->db->setTable($value);
+            }
             break;
         case 'testing':
             if (!is_bool($value)) {
                 throw new \InvalidArgumentException("Testing can be either 'true' or 'false'");
             }
             $this->testing = $value;
-            $this->db->setTesting($value);
+            if ($this->db !== null) {
+                $this->db->setTesting($value);
+            }
             break;
         case 'sessionName':
             $this->sessionName = $value;
