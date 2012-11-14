@@ -126,6 +126,23 @@ To use MySQL without Memcache:
     Zend_Session::setSaveHandler($saveHandler);
     register_shutdown_function('session_write_close');
 
+Using Memcache without MySQL:
+
+    <?php
+    use Lagged\Session\Autoload as SessionAutoload;
+    use Lagged\Session\SaveHandler\Memcache as SessionHandler;
+
+    // yay, include_path
+    require_once 'Lagged/Session/Autoload.php';
+    SessionAutoload::register();
+
+    $memcache = new Memcache();
+    $memcache->addServer($config->memcache->host); // assumes default port 11211
+
+    $saveHandler = new SessionHandler($memcache);
+    Zend_Session::setSaveHandler($saveHandler);
+    register_shutdown_function('session_write_close');
+
 ### Performance
 
 It's critical to set appropriate timeouts to MySQL:
@@ -141,6 +158,14 @@ Or to `\Zend_Db`:
     $config->database->params->driver_options = array(
         \MYSQLI_OPT_CONNECT_TIMEOUT => 5,
     );
+
+### Redundancy with Memcache
+
+To write to multiple servers, just do the following in your `php.ini` or `memcache.ini`:
+
+    memcache.redundancy=X
+
+X being the number of nodes in your Memcache setup.
 
 ### Error Handling
 

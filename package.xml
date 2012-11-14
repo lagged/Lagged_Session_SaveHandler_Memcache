@@ -16,11 +16,11 @@
   <email>till@lagged.biz</email>
   <active>yes</active>
  </lead>
- <date>2012-10-01</date>
- <time>23:06:01</time>
+ <date>2012-11-14</date>
+ <time>16:00:00</time>
  <version>
-  <release>0.7.0</release>
-  <api>0.7.0</api>
+  <release>0.8.0b1</release>
+  <api>0.8.0b1</api>
  </version>
  <stability>
   <release>beta</release>
@@ -28,7 +28,7 @@
  </stability>
  <license uri="http://www.opensource.org/licenses/bsd-license.php">New BSD License</license>
  <notes>
-Refactored error handling.
+Allow us to disable persistence completely and only rely on Memcached for session storage.
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -123,51 +123,4 @@ Refactored error handling.
    <install as="Lagged/Session/SaveHandler/Mysql.php" name="src/Lagged/Session/SaveHandler/Mysql.php" />
   </filelist>
  </phprelease>
- <changelog>
-  <release>
-   <version>
-    <release>0.5.0</release>
-    <api>0.5.0</api>
-   </version>
-   <stability>
-    <release>alpha</release>
-    <api>alpha</api>
-   </stability>
-   <date>2012-04-15</date>
-   <license uri="http://www.opensource.org/licenses/bsd-license.php">New BSD License</license>
-   <notes>
-Initial release.
-   </notes>
-  </release>
-  <release>
-   <version>
-    <release>0.6.0</release>
-    <api>0.6.0</api>
-   </version>
-   <stability>
-    <release>beta</release>
-    <api>beta</api>
-   </stability>
-   <date>2012-08-28</date>
-   <license uri="http://www.opensource.org/licenses/bsd-license.php">New BSD License</license>
-   <notes>
-Refactored MySQL usage inside the objects to avoid premature connecting to the mysqld.
-   </notes>
-  </release>
-  <release>
-   <version>
-    <release>0.7.0</release>
-    <api>0.7.0</api>
-   </version>
-   <stability>
-    <release>beta</release>
-    <api>beta</api>
-   </stability>
-   <date>2012-10-01</date>
-   <license uri="http://www.opensource.org/licenses/bsd-license.php">New BSD License</license>
-   <notes>
-Refactored error handling.
-   </notes>
-  </release>
- </changelog>
 </package>
