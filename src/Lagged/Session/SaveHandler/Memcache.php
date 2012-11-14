@@ -52,6 +52,10 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
             return $session;
         }
 
+        if ($this->db === null) {
+            return '';
+        }
+
         $session_data = $this->db->find($id);
         if (false === $session_data) {
             // db error
@@ -95,6 +99,10 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
             }
         } else {
             $this->debug(sprintf("Memcache::replace() success: '%s'", $id));
+        }
+
+        if ($this->db === null) {
+            return $status;
         }
 
         $user   = $this->getUserId($data);
@@ -144,6 +152,10 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
     {
         $this->memcache->delete($id);
         $this->debug(sprintf("Deleted session '%s' from Memcache.", $id));
+
+        if ($this->db === null) {
+            return;
+        }
 
         $status = $this->db->destroy($id);
         if (false === $status) {
