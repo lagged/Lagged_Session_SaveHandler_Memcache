@@ -102,7 +102,7 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
         }
 
         if ($this->db === null) {
-            return;
+            return $status;
         }
 
         $user   = $this->getUserId($data);
