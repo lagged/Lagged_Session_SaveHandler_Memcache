@@ -131,14 +131,18 @@ abstract class BaseAbstract
             $this->expire = $value;
             break;
         case 'table':
-            $this->db->setTable($value);
+            if ($this->db !== null) {
+                $this->db->setTable($value);
+            }
             break;
         case 'testing':
             if (!is_bool($value)) {
                 throw new \InvalidArgumentException("Testing can be either 'true' or 'false'");
             }
             $this->testing = $value;
-            $this->db->setTesting($value);
+            if ($this->db !== null) {
+                $this->db->setTesting($value);
+            }
             break;
         case 'sessionName':
             $this->sessionName = $value;
