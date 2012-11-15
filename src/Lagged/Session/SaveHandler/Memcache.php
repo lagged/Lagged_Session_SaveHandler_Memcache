@@ -97,12 +97,14 @@ class Memcache extends BaseAbstract implements \Zend_Session_SaveHandler_Interfa
             } else {
                 $this->debug(sprintf("Memcache::set() success: '%s'", $id));
             }
+            if (null === $this->db) {
+                return $status;
+            }
         } else {
             $this->debug(sprintf("Memcache::replace() success: '%s'", $id));
-        }
-
-        if ($this->db === null) {
-            return $status;
+            if (null === $this->db) {
+                return true;
+            }
         }
 
         $user   = $this->getUserId($data);
