@@ -11,29 +11,15 @@
     "repositories":[
         {
             "packagist":false
-        },
-        {
-            "type":"package",
-            "package":{
-                "name":"Zend",
-                "version":"1.11.11",
-                "source":{
-                    "url":"git://github.com/easybib/zf1.git",
-                    "type":"git",
-                    "reference":"85685af98192b2af8ddc27871b3d83aabb6f7efb"
-                }
-            }
         }
     ],
     "autoload": {
         "psr-0": {
             "Lagged\\Session": "src/",
-            "Zend": "vendor/",
             "Lagged\\Test": "tests/"
         }
     },
     "require":{
-        "php":">=5.3.0",
-        "Zend":">=1.11.1"
+        "php":">=5.3.0"
     }
 }
