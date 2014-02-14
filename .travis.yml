@@ -1,6 +1,14 @@
 language: php
-before_script: ./scripts/travis-deps.sh
+before_script:
+  - composer install --dev
+  - phpenv config-add etc/php-travis.ini
+
 php:
-  - 5.3
-  - 5.4
-script: phpunit --verbose --debug
+  - 5.5
+
+services:
+  - memcached
+
+script:
+  - composer validate
+  - phpunit --verbose --debug

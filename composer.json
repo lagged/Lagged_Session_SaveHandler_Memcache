@@ -1,5 +1,7 @@
 {
     "name":"lagged/Lagged_Session_SaveHandler_Memcache",
+    "description": "Memcache and MySQL session handlers for ZF1 with optional write-through cache.",
+    "license": "BSD-2-Clause",
     "type":"Library",
     "authors":[
         {
@@ -7,10 +9,13 @@
             "email":"till@php.net"
         }
     ],
-
     "repositories":[
         {
             "packagist":false
+        },
+        {
+            "type":"git",
+            "url": "git://github.com/easybib/zf1.git"
         }
     ],
     "autoload": {
@@ -21,5 +26,9 @@
     },
     "require":{
         "php":">=5.3.0"
-    }
+    },
+    "require-dev": {
+        "easybib-core/zf1": "*"
+    },
+    "prefer-stable": true
 }
