@@ -1,5 +1,7 @@
 {
     "name":"lagged/Lagged_Session_SaveHandler_Memcache",
+    "description": "Memcache and MySQL session handlers for ZF1 with optional write-through cache.",
+    "license": "BSD-2-Clause",
     "type":"Library",
     "authors":[
         {
