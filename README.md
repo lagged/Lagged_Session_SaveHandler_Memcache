@@ -103,7 +103,7 @@ This is likely to be in one of your bootstrap files:
     $memcache = new Memcache();
     $memcache->addServer($config->memcache->host); // assumes default port 11211
 
-    $db = new Zend_Db::factory('Mysqli', $config->database);
+    $db = Zend_Db::factory('Mysqli', $config->database);
 
     $saveHandler = new SessionHandler($memcache, $db);
     Zend_Session::setSaveHandler($saveHandler);
@@ -120,7 +120,7 @@ To use MySQL without Memcache:
     require_once 'Lagged/Session/Autoload.php';
     SessionAutoload::register();
 
-    $db = new Zend_Db::factory('Mysqli', $config->database);
+    $db = Zend_Db::factory('Mysqli', $config->database);
 
     $saveHandler = new SessionHandler($db);
     Zend_Session::setSaveHandler($saveHandler);
